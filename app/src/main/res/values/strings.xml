@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">SpecialFriends</string>
+    <string name="facebook_app_id">1874933972566991</string>
+    <string name="fb_login_protocol_scheme">fb1874933972566991</string>
+    <string name="Welcome">Welcome to</string>
+    <string name="Special">SPECIAL</string>
+    <string name="Friends">FRIENDS</string>
+</resources>
