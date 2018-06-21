@@ -3,10 +3,9 @@ package com.example.brandon.specialfriends;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
 
 @Entity
-public class User{
+public class UserFav {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
@@ -17,12 +16,11 @@ public class User{
     @ColumnInfo(name = "friend_name")
     private String name;
 
-    private char firstLetter;
 
     @ColumnInfo(name = "isFav")
     private boolean isFav;
 
-    public User(String imageUser, String name, boolean isFav) {
+    public UserFav(String imageUser, String name, boolean isFav) {
         this.imageUser = imageUser;
         this.name = name;
         this.isFav = isFav;
@@ -52,13 +50,6 @@ public class User{
         this.id = id;
     }
 
-    public char getFirstLetter() {
-        return name.toLowerCase().charAt(0);
-    }
-
-    public void setFirstLetter(char firstLetter) {
-        this.firstLetter = firstLetter;
-    }
 
     public boolean isFav() {
         return isFav;

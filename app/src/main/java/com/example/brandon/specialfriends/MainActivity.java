@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         if(isLoggedIn){
             Intent intent = new Intent(MainActivity.this, FriendsActivity.class);
             startActivity(intent);
+            finish();
         }
 
 
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
                 if(!accessToken.isExpired()){
                     Intent intent = new Intent(MainActivity.this, FriendsActivity.class);
                     startActivity(intent);
+                    finish();
                 }
             }
 

@@ -16,7 +16,7 @@
         android:layout_height="50dp"
         android:src="@drawable/ic_launcher_background"
         app:civ_border_width="2dp"
-        app:civ_border_color="#FF000000"/>
+        app:civ_border_color="#31b190"/>
 
 
     <TextView
@@ -31,13 +31,12 @@
 
         android:layout_rowSpan="2"/>
 
-    <Button
-        android:background="@mipmap/star"
-        android:id="@+id/button"
+    <ImageView
+        android:background="@drawable/starempty"
+        android:id="@+id/image_star"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_gravity="right|center"
-
 
         />
 
