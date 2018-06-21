@@ -31,7 +31,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
     List<User> users;
     HashMap<Character,Integer> myHash;
-    Context context;
 
 
     public MyAdapter(List<User> users, HashMap<Character, Integer> myHash) {
@@ -55,7 +54,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                 .build();
 
         holder.user_name.setText(users.get(position).getName());
-
 
         Picasso.get().load(users.get(position).getImageUser().toString()).into(holder.my_image_view);
 
@@ -81,12 +79,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
                     db.userDao().deleteById(userFav.getImageUser());
 
-
                     db.userDao().update(users.get(position));
-                    Log.e("Despues de eliminar",db.userDao().getFavUsers().size()+"");
+
                     Intent intent = new Intent(getApplicationContext(), FriendsActivity.class);
                     getApplicationContext().startActivity(intent);
-
+                    
                 }else {
                     Toast.makeText(getApplicationContext(), "GUARDADO", Toast.LENGTH_SHORT).show();
                     users.get(position).setFav(true);
@@ -103,7 +100,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                     //ACTUALIZO MI USUARIO EN MI TABLA USER
                     db.userDao().update(users.get(position));
 
-                    Log.e("Agregando",db.userDao().getFavUsers().size()+"");
+
                     Intent intent = new Intent(getApplicationContext(), FriendsActivity.class);
                     getApplicationContext().startActivity(intent);
                 }

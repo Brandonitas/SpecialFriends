@@ -31,6 +31,7 @@ import org.json.JSONObject;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -49,9 +50,11 @@ public class FriendsActivity extends AppCompatActivity {
     RecyclerView recyclerViewFav;
     RecyclerView.Adapter adapterFriends;
 
-    List<UserFav> myUserList;
+    List<UserFav> myUserFavList;
 
     AppDatabase db;
+    List<User> list;
+    
 
 
     @Override
@@ -78,20 +81,25 @@ public class FriendsActivity extends AppCompatActivity {
                 .allowMainThreadQueries().fallbackToDestructiveMigration()
                 .build();
 
-        //Log.e("DATABASE", db.userDao().getAllUsers().get(0).getName());
 
 
         nameTxt = (TextView) findViewById(R.id.tv_name);
         profileImage = (CircleImageView) findViewById(R.id.image_profile);
 
-        //CARGAR USUARIOS FAV
-        myUserList = db.userDao().getFavUsers();
+        //CARGAR AMIGOS FAV
+        myUserFavList = db.userDao().getFavUsers();
 
+        //CARGAR TODOS LOS AMIGOS
+        list = db.userDao().getAllUsers();
+
+
+        //RECYCLER VIEW HORIZONTAL
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL,false);
         recyclerViewFav = (RecyclerView) findViewById(R.id.recyclerFriends);
         recyclerViewFav.setLayoutManager(layoutManager);
 
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
+
 
         GraphRequest request = GraphRequest.newMeRequest(accessToken, mGraphCallBack);
         Bundle params = new Bundle();
@@ -108,11 +116,11 @@ public class FriendsActivity extends AppCompatActivity {
             try{
 
                 Picasso.get().load(response.getJSONObject().getJSONObject("picture").getJSONObject("data").getString("url")).into(profileImage);
-
                 nameTxt.setText(object.getString("name"));
-                Log.e("MYLOG1",object.getString("id"));
-                Log.e("MYLOG",response.getJSONObject().getJSONObject("friends").getJSONArray("data").length()+"");
 
+
+
+                //ACTIVO PARA QUE SE ACTUALICEN LOS AMIGOS EN CASO DE AGREGAR NUEVOS
                 int amigos = response.getJSONObject().getJSONObject("friends").getJSONArray("data").length();
                 ArrayList<User> users = new ArrayList<>();
                 for (int i = 0; i < amigos ; i++) {
@@ -130,24 +138,30 @@ public class FriendsActivity extends AppCompatActivity {
                     }
                 });
 
-                //MODIFICAR ESTO PARA QUE CADA QUE INICIA
-                    //db.userDao().delete();
-                    for (int i = 0; i < users.size(); i++) {
-                        db.userDao().insertUser(users.get(i));
-                    }
 
+
+                //VERIFICO SI TENGO AMIGOS NUEVOS Y AGREGO
+
+                if(db.userDao().getAllUsers().size()!=users.size()){
+                    Log.e("MYLOG1","no son iguales");
+                    for (int i = 0; i < users.size(); i++) {
+                        Log.e("MYLOG2","no son iguales");
+                        if(!db.userDao().getAllUsers().contains(users.get(i))){
+                            Log.e("MYLOG3","no son iguales");
+                            db.userDao().insertUser(users.get(i));
+                        }
+                    }
+                }
 
                 //CREO MI HASHMAP PARA DIVIDIR POR LETRAS
-                HashMap<Character,Integer> myHash = createHash(users);
+                HashMap<Character,Integer> myHash = createHash(list);
 
 
-                Log.e("MI NUMERO DE E",myHash.get('w')+"");
+                //AGREGAR ADAPTERS A RECYCLER VIEW
                 adapter = new MyAdapter(db.userDao().getAllUsers(),myHash);
                 recyclerView.setAdapter(adapter);
 
-
-                //CARGAR USUARIOS FAVORITOS
-                adapterFriends = new MyAdapterFav(myUserList);
+                adapterFriends = new MyAdapterFav(myUserFavList);
                 recyclerViewFav.setAdapter(adapterFriends);
 
 
@@ -160,7 +174,7 @@ public class FriendsActivity extends AppCompatActivity {
     };
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public HashMap<Character,Integer> createHash(ArrayList<User> user){
+    public HashMap<Character,Integer> createHash(List<User> user){
         HashMap<Character,Integer> myHash = new HashMap<>();
 
         for (int i = 0; i < user.size(); i++) {
