@@ -1,5 +1,7 @@
 package com.example.brandon.specialfriends;
 
+import android.arch.persistence.room.Room;
+import android.arch.persistence.room.RoomDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,6 +15,7 @@ import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.widget.ProfilePictureView;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,11 +23,15 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class FriendsActivity extends AppCompatActivity {
 
     private TextView nameTxt;
-    private ProfilePictureView profileImage;
+    private CircleImageView profileImage;
     RecyclerView recyclerView;
     RecyclerView.Adapter adapter;
 
@@ -39,17 +46,22 @@ public class FriendsActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        AppDatabase db = Room.databaseBuilder(getApplicationContext(),AppDatabase.class,"production")
+                .allowMainThreadQueries()
+                .build();
+
 
         nameTxt = (TextView) findViewById(R.id.tv_name);
-        profileImage = (ProfilePictureView) findViewById(R.id.image_profile);
+        profileImage = (CircleImageView) findViewById(R.id.image_profile);
 
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
 
         GraphRequest request = GraphRequest.newMeRequest(accessToken, mGraphCallBack);
         Bundle params = new Bundle();
-        params.putString("fields", "id,name,picture.height(600),friends.limit(4)");
+        params.putString("fields", "id,name,picture.height(600),friends{picture,name}");
         request.setParameters(params);
         request.executeAsync();
+
     }
 
     protected GraphRequest.GraphJSONObjectCallback mGraphCallBack = new GraphRequest.GraphJSONObjectCallback() {
@@ -57,39 +69,38 @@ public class FriendsActivity extends AppCompatActivity {
         public void onCompleted(JSONObject object, GraphResponse response) {
             try{
 
-                profileImage.setProfileId(object.getString("id"));
+                Picasso.get().load(response.getJSONObject().getJSONObject("picture").getJSONObject("data").getString("url")).into(profileImage);
+
                 nameTxt.setText(object.getString("name"));
-                Log.e("MYLOG1","hola");
+                Log.e("MYLOG1",object.getString("id"));
                 Log.e("MYLOG",response.getJSONObject().getJSONObject("friends").getJSONArray("data").length()+"");
 
                 int amigos = response.getJSONObject().getJSONObject("friends").getJSONArray("data").length();
                 ArrayList<User> users = new ArrayList<>();
                 for (int i = 0; i < amigos ; i++) {
                     String nombre = response.getJSONObject().getJSONObject("friends").getJSONArray("data").getJSONObject(i).getString("name");
-                    int id = response.getJSONObject().getJSONObject("friends").getJSONArray("data").getJSONObject(i).getInt("id");
-                    users.add(new User(id, nombre));
+                    String image = response.getJSONObject().getJSONObject("friends").getJSONArray("data").getJSONObject(i).getJSONObject("picture").getJSONObject("data").getString("url");
+                    users.add(new User(image, nombre));
+
                 }
+
+                //ORDENA MI ARREGLO EN ORDEN ALFABÉTICO
+                Collections.sort(users, new Comparator<User>() {
+                    @Override
+                    public int compare(User obj1, User obj2) {
+                        return obj1.getName().compareTo(obj2.getName());
+                    }
+                });
 
                 adapter = new MyAdapter(users);
                 recyclerView.setAdapter(adapter);
-                //nameTxt.setText("Welcome"+object.getString("name"));
-                //JSONArray rawName = response.getJSONObject().getJSONObject("friends").getJSONArray("data");
 
-                /*JSONArray rawName = object.getJSONObject("friends").getJSONArray("data");
-
-                ArrayList<String> friends = new ArrayList<>();
-                try{
-                    for(int i = 0;i<rawName.length();i++){
-                        friends.add(rawName.getJSONObject(i).getString("name"));
-                    }
-                }catch (JSONException e){
-                    e.printStackTrace();
-                }*/
-                //nameTxt.setText("hola"+friends.get(0));
 
             }catch (Exception e){
                 e.printStackTrace();
             }
         }
     };
+
+
 }
