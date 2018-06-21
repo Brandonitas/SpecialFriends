@@ -2,6 +2,7 @@ package com.example.brandon.specialfriends;
 
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
+import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
@@ -9,14 +10,17 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
 import com.facebook.login.widget.ProfilePictureView;
 import com.squareup.picasso.Picasso;
 
@@ -36,6 +40,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class FriendsActivity extends AppCompatActivity {
 
+    private ImageView imageView;
     private TextView nameTxt;
     private CircleImageView profileImage;
     RecyclerView recyclerView;
@@ -58,6 +63,16 @@ public class FriendsActivity extends AppCompatActivity {
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        imageView = (ImageView)findViewById(R.id.logout);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LoginManager.getInstance().logOut();
+                Intent intent = new Intent(FriendsActivity.this,MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         db = Room.databaseBuilder(getApplicationContext(),AppDatabase.class,"production")
                 .allowMainThreadQueries().fallbackToDestructiveMigration()
@@ -116,8 +131,7 @@ public class FriendsActivity extends AppCompatActivity {
                 });
 
                 //MODIFICAR ESTO PARA QUE CADA QUE INICIA
-
-
+                    //db.userDao().delete();
                     for (int i = 0; i < users.size(); i++) {
                         db.userDao().insertUser(users.get(i));
                     }

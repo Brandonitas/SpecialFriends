@@ -5,9 +5,10 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="12dp"
+    android:padding="16dp"
     android:columnCount="3"
-    android:rowCount="2">
+    android:rowCount="2"
+    app:ignore="NamespaceTypo">
 
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -16,7 +17,12 @@
         android:layout_height="50dp"
         android:src="@drawable/ic_launcher_background"
         app:civ_border_width="2dp"
-        app:civ_border_color="#31b190"/>
+        app:civ_border_color="#31b190"
+        />
+
+
+
+
 
 
     <TextView
@@ -24,7 +30,8 @@
         android:paddingLeft="10dp"
         android:textSize="22sp"
         android:id="@+id/name"
-        android:text="gagsgsfafsffjajfhasasf"
+        android:textColor="@color/textColor"
+        android:layout_marginLeft="10dp"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
 

@@ -33,6 +33,6 @@ public interface UserDao {
     @Query("DELETE FROM  userfav   WHERE userfav.friend_id LIKE :id")
     void deleteById(String id);
 
-    @Query("DELETE FROM userfav")
+    @Query("DELETE FROM user")
     void delete();
 }
