@@ -1,9 +1,13 @@
 package com.example.brandon.specialfriends;
 
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -31,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -128,14 +133,6 @@ public class MainActivity extends AppCompatActivity {
                         return obj1.getName().compareTo(obj2.getName());
                     }
                 });
-
-
-                //VERIFICO SI NO TENGO AMIGOS NUEVOS Y AGREGO
-                /*for (int i = 0; i < users.size(); i++) {
-                    if(!db.userDao().getAllUsers().contains(users.get(i))){
-                        db.userDao().insertUser(users.get(i));
-                    }
-                }*/
 
                 //VERIFICO SI TENGO AMIGOS NUEVOS Y AGREGO
 

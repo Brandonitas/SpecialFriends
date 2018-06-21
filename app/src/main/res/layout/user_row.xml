@@ -21,10 +21,6 @@
         />
 
 
-
-
-
-
     <TextView
         android:layout_gravity="center"
         android:paddingLeft="10dp"

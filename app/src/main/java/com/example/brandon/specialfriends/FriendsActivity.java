@@ -1,5 +1,6 @@
 package com.example.brandon.specialfriends;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Intent;
@@ -72,8 +73,9 @@ public class FriendsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 LoginManager.getInstance().logOut();
                 Intent intent = new Intent(FriendsActivity.this,MainActivity.class);
-                startActivity(intent);
                 finish();
+                startActivity(intent);
+
             }
         });
 
@@ -142,7 +144,8 @@ public class FriendsActivity extends AppCompatActivity {
 
                 //VERIFICO SI TENGO AMIGOS NUEVOS Y AGREGO
 
-                if(db.userDao().getAllUsers().size()!=users.size()){
+
+                if(list.size()!=users.size()){
                     Log.e("MYLOG1","no son iguales");
                     for (int i = 0; i < users.size(); i++) {
                         Log.e("MYLOG2","no son iguales");
