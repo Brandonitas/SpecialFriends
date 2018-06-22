@@ -1,8 +1,6 @@
 package com.example.brandon.specialfriends;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Room;
-import android.arch.persistence.room.RoomDatabase;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -15,24 +13,22 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.brandon.specialfriends.adapters.MyAdapter;
+import com.example.brandon.specialfriends.adapters.MyAdapterFav;
+import com.example.brandon.specialfriends.db.AppDatabase;
+import com.example.brandon.specialfriends.pojo.User;
+import com.example.brandon.specialfriends.pojo.UserFav;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
-import com.facebook.login.widget.ProfilePictureView;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;

@@ -1,13 +1,8 @@
 package com.example.brandon.specialfriends;
 
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
 import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Parcelable;
-import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,26 +11,23 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.example.brandon.specialfriends.db.AppDatabase;
+import com.example.brandon.specialfriends.pojo.User;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 

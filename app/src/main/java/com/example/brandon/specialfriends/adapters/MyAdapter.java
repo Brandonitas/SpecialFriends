@@ -1,30 +1,27 @@
-package com.example.brandon.specialfriends;
+package com.example.brandon.specialfriends.adapters;
 
 import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.brandon.specialfriends.FriendsActivity;
+import com.example.brandon.specialfriends.R;
+import com.example.brandon.specialfriends.db.AppDatabase;
+import com.example.brandon.specialfriends.pojo.User;
+import com.example.brandon.specialfriends.pojo.UserFav;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
