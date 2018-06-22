@@ -4,6 +4,8 @@ import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.media.Image;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,6 +19,9 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -66,6 +71,14 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         holder.image_star.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                //VALIDA SI TENEMOS INTERNET O NO
+                //SI NO TENEMOS NO ME DEJA GUARDAR A MIS FAVORITOS
+                if(!Utility.isNetworkAvailable(getApplicationContext())){
+                    Toast.makeText(getApplicationContext(), "No WIFI", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 if(users.get(position).isFav()){
                     Toast.makeText(getApplicationContext(), "Eliminado", Toast.LENGTH_SHORT).show();
                     users.get(position).setFav(false);
@@ -130,58 +143,21 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     }
 
 
-
-    //TWO VIEWS
-    /*@NonNull
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        this.context = parent.getContext();
-        for(int i= viewType;i==0;i--){
-            if(i==viewType){
-                LayoutInflater inflater = LayoutInflater.from(context);
-                View view = inflater.inflate(R.layout.letter_layout,parent,false);
-                return new ViewHolderLetter(view);
-            }else{
-                LayoutInflater inflater = LayoutInflater.from(context);
-                View view = inflater.inflate(R.layout.user_row,parent,false);
-                return new ViewHolderLetter(view);
-            }
+    //METODO PARA VALIDAR SI TENEMOS INTERNET
+    public static class Utility {
+        public static boolean isNetworkAvailable(Context context) {
+            ConnectivityManager connectivityManager
+                    = (ConnectivityManager)  context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
         }
-
-        LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.user_row,parent,false);
-        return new ViewHolderLetter(view);
-
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-
-    }
-
-    @Override
-    public int getItemCount() {
-        return users.size();
     }
 
 
-      @Override
-    public int getItemViewType(int position) {
-        Iterator ite = this.myHash.entrySet().iterator();
-        while (ite.hasNext()) {
-            HashMap.Entry e = (HashMap.Entry) ite.next();
-            int temp = (int) e.getValue();
-            if (temp != 0) {
-                //e.setValue(temp--);
-                return temp;
-            } else {
-                return 0;
-            }
-        }
-        return 0;
-    }
+//-----INTENTO DE MULTIPLE VIEW TYPE--------//
 
-     class ViewHolderLetter extends RecyclerView.ViewHolder {
+/*
+    class ViewHolderLetter extends RecyclerView.ViewHolder {
         public Button button;
 
         public ViewHolderLetter(View itemView) {
@@ -190,8 +166,136 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         }
     }
 
-    */
 
+
+    @Override
+    public int getItemCount() {
+        return users.size()+myHash.size();
+    }
+
+     @Override
+    public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, final int position) {
+
+        switch (holder.getItemViewType()){
+            case 0:
+                ViewHolderLetter viewHolderLetter = (ViewHolderLetter)holder;
+                User user = users.get(position);
+                viewHolderLetter.setIsRecyclable(false);
+                viewHolderLetter.button.setText(user.getFirstLetter()+"");
+
+                break;
+            case 1:
+                ViewHolderFriend viewHolderFriend = (ViewHolderFriend)holder;
+                //User user2 = users.get(position);
+                viewHolderFriend.setIsRecyclable(false);
+
+                //Aca
+                final AppDatabase db = Room.databaseBuilder(getApplicationContext(),AppDatabase.class,"production")
+                        .allowMainThreadQueries()
+                        .build();
+
+                viewHolderFriend.user_name.setText(users.get(position).getName());
+
+                Picasso.get().load(users.get(position).getImageUser().toString()).into(viewHolderFriend.my_image_view);
+
+                if(users.get(position).isFav()){
+                    viewHolderFriend.image_star.setImageResource(R.drawable.star);
+                }else{
+                    viewHolderFriend.image_star.setImageResource(R.drawable.starempty);
+                }
+
+                viewHolderFriend.image_star.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(users.get(position).isFav()){
+                            Toast.makeText(getApplicationContext(), "Eliminado", Toast.LENGTH_SHORT).show();
+                            users.get(position).setFav(false);
+                            viewHolderFriend.image_star.setImageResource(R.drawable.starempty);
+
+                            String image = users.get(position).getImageUser();
+                            String name = users.get(position).getName();
+                            boolean isFav = users.get(position).isFav();
+
+                            UserFav userFav = new UserFav(image, name, isFav);
+
+                            db.userDao().deleteById(userFav.getImageUser());
+
+                            db.userDao().update(users.get(position));
+
+                            Intent intent = new Intent(getApplicationContext(), FriendsActivity.class);
+                            getApplicationContext().startActivity(intent);
+
+                        }else {
+                            Toast.makeText(getApplicationContext(), "GUARDADO", Toast.LENGTH_SHORT).show();
+                            users.get(position).setFav(true);
+                            viewHolderFriend.image_star.setImageResource(R.drawable.star);
+
+                            String image = users.get(position).getImageUser();
+                            String name = users.get(position).getName();
+                            boolean isFav = users.get(position).isFav();
+
+                            UserFav userFav = new UserFav(image, name, isFav);
+
+                            db.userDao().insertFavUser(userFav);
+
+                            //ACTUALIZO MI USUARIO EN MI TABLA USER
+                            db.userDao().update(users.get(position));
+
+
+                            Intent intent = new Intent(getApplicationContext(), FriendsActivity.class);
+                            getApplicationContext().startActivity(intent);
+                        }
+                    }
+                });
+
+
+
+                break;
+        }
+
+    }
+
+
+    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        this.context = parent.getContext();
+        if(viewType==0) {
+            LayoutInflater inflater = LayoutInflater.from(context);
+            View view = inflater.inflate(R.layout.letter_layout, parent, false);
+            return new ViewHolderLetter(view);
+        }else{
+            LayoutInflater inflater2 = LayoutInflater.from(context);
+            View view2 = inflater2.inflate(R.layout.user_row,parent,false);
+            return new ViewHolderLetter(view2);
+
+        }
+    }
+
+
+      int temp;
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public int getItemViewType(int position) {
+        Iterator ite = this.myHash.entrySet().iterator();
+        while (ite.hasNext()) {
+            HashMap.Entry e = (HashMap.Entry) ite.next();
+            temp = (int) e.getValue();
+            for(int i=temp;i>=temp;i--){
+                if(i==0){
+                    Log.e("MYLOG","regreso 0");
+                    return 0;
+                }else{
+                    Log.e("MYLOG","regreso 1");
+                    return 1;
+                }
+            }
+        }
+        return 0;
+    }
+
+*/
 
 
 
